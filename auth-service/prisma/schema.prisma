@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// DATABASE MODELS
+model Usuario {
+  usuario_id            Int                 @id @default(autoincrement())
+  jefe_directo_id       Int?
+  nombre                String
+  apellidos             String
+  correo                String              @unique
+  password              String
+  rol                   Rol
+  departamento          String
+  activo                Boolean             @default(true)
+  fecha_creacion        DateTime            @default(now())
+
+  jefe_directo          Usuario?            @relation("JefeDirecto", fields: [jefe_directo_id], references: [usuario_id])
+  
+  colaboradores         Usuario[]           @relation("JefeDirecto")
+}
+
+// ENUMS
+enum Rol {
+  Tesorería
+  Jefe
+  Colaborador
+  Administrador
+}

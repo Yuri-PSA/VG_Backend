@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: viaticos_db
+    restart: always
+    environment:
+      POSTGRES_USER: yuriana
+      POSTGRES_PASSWORD: yuriana09
+      POSTGRES_DB: viaticos_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      
+volumes:
+  pgdata:
