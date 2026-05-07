@@ -3,7 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider    = "postgresql"
+  schemas     = ["auth"]
 }
 
 // DATABASE MODELS
@@ -22,6 +23,8 @@ model Usuario {
   jefe_directo          Usuario?            @relation("JefeDirecto", fields: [jefe_directo_id], references: [usuario_id])
   
   colaboradores         Usuario[]           @relation("JefeDirecto")
+
+  @@schema("auth")
 }
 
 // ENUMS
@@ -30,4 +33,6 @@ enum Rol {
   Jefe
   Colaborador
   Administrador
+
+  @@schema("auth")
 }

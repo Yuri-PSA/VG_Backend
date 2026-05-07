@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  schemas = ["core"]
 }
 
 
@@ -30,6 +31,8 @@ model Solicitud {
   comprobacion          Comprobacion?
   liquidacion           Liquidacion?
   aprobaciones          Aprobacion[] @relation("AprobacionSolicitud")
+
+  @@schema("core")
 }
 
 model Comprobacion {
@@ -50,6 +53,8 @@ model Comprobacion {
  
   facturas              Factura[]
   aprobaciones          Aprobacion[] @relation("AprobacionComprobacion")
+
+  @@schema("core")
 }
 
 model Factura {
@@ -73,6 +78,8 @@ model Factura {
   comprobacion          Comprobacion @relation(fields: [comprobacion_id], references: [comprobacion_id])
 
   tipos_cambio           TiposCambio?
+
+  @@schema("core")
 }
 
 model TiposCambio {
@@ -83,6 +90,8 @@ model TiposCambio {
   tipo_cambio           Decimal             @db.Decimal(10, 2)
 
   factura               Factura @relation(fields: [factura_id], references: [factura_id])
+
+  @@schema("core")
 }
 
 model Aprobacion {
@@ -96,6 +105,8 @@ model Aprobacion {
 
   solicitud             Solicitud? @relation("AprobacionSolicitud", fields: [solicitud_id], references: [solicitud_id])
   comprobacion          Comprobacion? @relation("AprobacionComprobacion", fields: [comprobacion_id], references: [comprobacion_id])
+
+  @@schema("core")
 }
 
 model Notificacion {
@@ -106,6 +117,8 @@ model Notificacion {
   cuerpo                String
 
   usuarios              NotificacionUsuario[]
+
+  @@schema("core")
 }
 
 model NotificacionUsuario {
@@ -115,6 +128,8 @@ model NotificacionUsuario {
   fecha_envio           DateTime            @default(now())
 
   notificacion          Notificacion @relation(fields: [notificacion_id], references: [notificacion_id])
+
+  @@schema("core")
 }
 
 model Liquidacion {
@@ -131,6 +146,8 @@ model Liquidacion {
   ruta_comprobacion     String?
 
   solicitud             Solicitud @relation(fields: [solicitud_id], references: [solicitud_id])
+
+  @@schema("core")
 }
 
 
@@ -138,6 +155,8 @@ model Liquidacion {
 enum FormaPago {
   Transferencia
   Efectivo
+
+  @@schema("core")
 }
 
 enum EstadoSol {
@@ -145,28 +164,38 @@ enum EstadoSol {
   Aprobada
   Rechazada
   Cancelada
+
+  @@schema("core")
 }
 
 enum EstadoFinanciero {
   Pendiente
   Liquidada
+
+  @@schema("core")
 }
 
 enum EstadoCmp {
   Pendiente
   Aprobada
   Rechazada
+
+  @@schema("core")
 }
 
 enum Acciones {
   Aprobar
   Rechazar
+
+  @@schema("core")
 }
 
 enum TipoNotificacion {
   Solicitud
   Comprobación
   Anticipo
+
+  @@schema("core")
 }
 
 enum EventoNotificacion {
@@ -178,12 +207,16 @@ enum EventoNotificacion {
   Vencida
   Recordatorio
   Liquidada
+
+  @@schema("core")
 }
 
 enum TipoAjuste {
   Devolución
   Reembolso
   Sin_diferencia
+
+  @@schema("core")
 }
 
 enum EstadoLiquidacion {
@@ -191,4 +224,6 @@ enum EstadoLiquidacion {
   Pagado
   Devuelto
   Saldado
+
+  @@schema("core")
 }
