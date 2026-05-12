@@ -1,10 +1,6 @@
-import { IsInt, IsNotEmpty, IsString, IsIn, IsDateString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsIn, IsDateString, IsNumber } from 'class-validator';
 
 export class CreateSolicitudeDto {
-    @IsInt()
-    @IsNotEmpty()
-    usuario_id!: number;
-
     @IsDateString()
     @IsNotEmpty()
     inicio_viaje!: string;

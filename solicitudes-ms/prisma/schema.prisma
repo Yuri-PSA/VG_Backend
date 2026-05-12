@@ -33,6 +33,7 @@ model Solicitud {
   aprobaciones          Aprobacion[] @relation("AprobacionSolicitud")
 
   @@schema("core")
+  @@map("solicitud")
 }
 
 model Comprobacion {
@@ -55,6 +56,7 @@ model Comprobacion {
   aprobaciones          Aprobacion[] @relation("AprobacionComprobacion")
 
   @@schema("core")
+  @@map("comprobacion")
 }
 
 model Factura {
@@ -80,6 +82,7 @@ model Factura {
   tipos_cambio           TiposCambio?
 
   @@schema("core")
+  @@map("factura")
 }
 
 model TiposCambio {
@@ -92,6 +95,7 @@ model TiposCambio {
   factura               Factura @relation(fields: [factura_id], references: [factura_id])
 
   @@schema("core")
+  @@map("tipos_cambio")
 }
 
 model Aprobacion {
@@ -107,6 +111,7 @@ model Aprobacion {
   comprobacion          Comprobacion? @relation("AprobacionComprobacion", fields: [comprobacion_id], references: [comprobacion_id])
 
   @@schema("core")
+  @@map("aprobacion")
 }
 
 model Notificacion {
@@ -119,6 +124,7 @@ model Notificacion {
   usuarios              NotificacionUsuario[]
 
   @@schema("core")
+  @@map("notificacion")
 }
 
 model NotificacionUsuario {
@@ -130,6 +136,7 @@ model NotificacionUsuario {
   notificacion          Notificacion @relation(fields: [notificacion_id], references: [notificacion_id])
 
   @@schema("core")
+  @@map("notificacion_usuario")
 }
 
 model Liquidacion {
@@ -148,6 +155,7 @@ model Liquidacion {
   solicitud             Solicitud @relation(fields: [solicitud_id], references: [solicitud_id])
 
   @@schema("core")
+  @@map("liquidacion")
 }
 
 

@@ -25,6 +25,7 @@ model Usuario {
   colaboradores         Usuario[]           @relation("JefeDirecto")
 
   @@schema("auth")
+  @@map("usuario")
 }
 
 // ENUMS
