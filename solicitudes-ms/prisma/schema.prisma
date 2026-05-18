@@ -212,9 +212,11 @@ enum EventoNotificacion {
   Enviada
   Cancelada
   Modificada
-  Vencida
   Recordatorio
-  Liquidada
+  
+  Entregado
+  Confirmado
+  Pendiente
 
   @@schema("core")
 }

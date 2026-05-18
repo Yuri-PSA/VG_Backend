@@ -59,4 +59,58 @@ export class SolicitudesController {
       body.motivoRechazo,
     );
   }
+
+  @Get('detalle')
+  @UseGuards(JwtAuthGuard)
+  async obtenerDetalle(
+    @Req() req,
+    @Query('folio') folio: string,
+  ){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.detalleSolicitud(userId, folio);
+  }
+
+  @Patch('cancelar')
+  @UseGuards(JwtAuthGuard)
+  async cancelarSolicitud(
+    @Req() req,
+    @Body() body: { folio: string },
+  ){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.cancelarSolicitud(userId, body.folio);
+  }
+
+  @Patch('anticipo')
+  @UseGuards(JwtAuthGuard)
+  async gestionarAnticipo(
+    @Req() req,
+    @Body() body: { 
+      folio: string; 
+      fechaEntrega?: string; 
+      fechaConfirmacion?: string; 
+      rutaComprobante?: string; 
+      noRecibido?: boolean;
+    },
+  ){
+    const userId = req.user.usuario_id;
+    
+    return this.solicitudesService.gestionarAnticipo(
+      userId,
+      body.folio,
+      body.fechaEntrega,
+      body.fechaConfirmacion,
+      body.rutaComprobante,
+      body.noRecibido,
+    );
+  }
+
+  @Patch('editar')
+  @UseGuards(JwtAuthGuard)
+  async editarSolicitud(
+    @Req() req,
+    @Body() editDto: UpdateSolicitudeDto,
+  ){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.editarSolicitud(userId, editDto);
+  }
 }

@@ -11,9 +11,16 @@ export class AuthService {
 
     async validateUser(correo: string, plainPassword: string): Promise<any> {
         const user = await this.prisma.$queryRawUnsafe<
-            Array<{ usuario_id: number; correo: string; rol: string; password: string; }>
+            Array<{ 
+                usuario_id: number; 
+                correo: string; 
+                rol: string;
+                password: string;
+                nombre: string;
+                apellidos: string; 
+            }>
         >(
-            `SELECT usuario_id, correo, rol, password
+            `SELECT usuario_id, correo, rol, password, nombre, apellidos
             FROM auth.usuario
             WHERE correo = $1`,
             correo,
@@ -32,19 +39,33 @@ export class AuthService {
             usuario.usuario_id,
         );
 
+        const firstName = usuario.nombre.split(' ')[0];
+        const lastName = usuario.apellidos.split(' ')[0];
+        const shortName = `${firstName} ${lastName}`;
+
         if(result[0]?.match) {
             const { password, ...rest } = usuario;
-            return rest; // return data without password
+            return { ...rest, nombre: shortName }; // return data without password
         }
         throw new UnauthorizedException('Credenciales incorrectas. Por favor, verifica tu correo y contraseña');
     }
 
     async login(correo: string, password: string) {
         const user = await this.validateUser(correo, password);
-        const payload = { sub: user.usuario_id, correo: user.correo, rol: user.rol };
+        const payload = {
+            sub: user.usuario_id,
+            correo: user.correo,
+            rol: user.rol,
+            nombre: user.nombre,
+        };
         return {
             access_token: this.jwtService.sign(payload),
-            usuario: user,
+            usuario: {
+                usuario_id: user.usuario_id,
+                correo: user.correo,
+                rol: user.rol,
+                nombre: user.nombre,
+            },
         };
     }
 }

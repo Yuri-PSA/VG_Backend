@@ -28,4 +28,8 @@ export class CreateSolicitudeDto {
     @IsIn(['Transferencia', 'Efectivo'])
     @IsNotEmpty()
     forma_pago!: 'Transferencia' | 'Efectivo';
+
+    @IsDateString()
+    @IsNotEmpty()
+    fecha_recepcion!: string;    
 }
