@@ -2,9 +2,22 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import * as path from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // Crear carpeta
+  const uploadsPath = path.join(process.cwd(), 'uploads', 'comprobantes');
+  if(!fs.existsSync(uploadsPath))
+    fs.mkdirSync(uploadsPath, { recursive: true });
+  
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Servir archivos estáticos -> imágenes de comprobantes
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
+
   app.use(cookieParser());
 
   app.useGlobalPipes(new ValidationPipe({

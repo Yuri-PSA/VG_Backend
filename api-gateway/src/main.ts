@@ -27,6 +27,14 @@ async function bootstrap() {
     createProxyMiddleware({
       target: 'http://localhost:3002',
       changeOrigin: true,
+      pathFilter: '/uploads',
+    }),
+  );
+
+  app.use(
+    createProxyMiddleware({
+      target: 'http://localhost:3002',
+      changeOrigin: true,
       pathFilter: '/api',
       pathRewrite: {
         '^/api': '',

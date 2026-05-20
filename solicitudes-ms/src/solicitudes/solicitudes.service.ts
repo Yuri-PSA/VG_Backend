@@ -192,7 +192,7 @@ export class SolicitudesService {
     };
   }
 
-  async cancelarSolicitud(userId: number, folio: string) {
+  async cancelarSolicitud(userId: number, folio: string){
     const result = await this.prisma.$queryRaw<
       Array<{ mensaje: string | null }>
     >`

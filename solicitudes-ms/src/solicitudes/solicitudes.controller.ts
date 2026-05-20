@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { SolicitudesService } from './solicitudes.service';
 import { CreateSolicitudeDto } from './dto/create-solicitude.dto';
 import { UpdateSolicitudeDto } from './dto/update-solicitude.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from '../config/multer.config';
+
 
 @Controller('solicitudes')
 export class SolicitudesController {
@@ -112,5 +115,17 @@ export class SolicitudesController {
   ){
     const userId = req.user.usuario_id;
     return this.solicitudesService.editarSolicitud(userId, editDto);
+  }
+
+  @Post('upload-comprobante')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file', multerConfig))
+  async uploadComprobante(@UploadedFile() file: Express.Multer.File){
+    if(!file)
+      throw new BadRequestException('No se ha enviado ningún archivo');
+
+    // Construir la ruta relativa que se guardará en la BD
+    const rutaRelativa = `uploads/comprobantes/${file.filename}`;
+    return { ruta: rutaRelativa };
   }
 }
