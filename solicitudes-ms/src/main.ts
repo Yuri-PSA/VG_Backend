@@ -8,10 +8,20 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 async function bootstrap() {
-  // Crear carpeta
-  const uploadsPath = path.join(process.cwd(), 'uploads', 'comprobantes');
-  if(!fs.existsSync(uploadsPath))
-    fs.mkdirSync(uploadsPath, { recursive: true });
+  // Crear carpetas
+  const baseDirs = [
+    'uploads/comprobantes/anticipos',
+    'uploads/comprobantes/liquidaciones',
+    'uploads/facturas/pdf',
+    'uploads/facturas/xml',
+    'uploads/facturas/img',
+  ];
+
+  baseDirs.forEach(dir => {
+    const fullPath = path.join(process.cwd(), dir);
+    if(!fs.existsSync(fullPath))
+      fs.mkdirSync(fullPath, { recursive: true });
+  });
   
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 

@@ -1,8 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSolicitudeDto } from './dto/create-solicitude.dto';
 import { UpdateSolicitudeDto } from './dto/update-solicitude.dto';
-import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class SolicitudesService {
@@ -258,5 +257,86 @@ export class SolicitudesService {
       throw new HttpException(row.mensaje, HttpStatus.BAD_REQUEST);
 
     return { mensaje: row.mensaje };
+  }
+
+  async getSolicitudesAprobadas(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{ mensaje: string | null; folio_solicitud: string | null; monto_moneda: string | null }>
+    >`
+      SELECT * FROM core.sp_approved_requests(${userId}::INT)
+    `;
+
+    if(result.length > 0 && result[0].mensaje)
+      throw new HttpException(result[0].mensaje, HttpStatus.BAD_REQUEST);
+
+    return result
+      .filter(r => r.folio_solicitud !== null && r.monto_moneda !== null)
+      .map(r => ({
+        folio: r.folio_solicitud,
+        moneda: r.monto_moneda,
+    }));
+  }
+
+  async getTipoCambio(moneda: string, fecha?: string){
+    if(moneda === 'MXN')
+      return { tipoCambio: 1.0000, moneda: 'MXN' };
+
+    const BANXICO_TOKEN = process.env.BANXICO_TOKEN;
+    if(!BANXICO_TOKEN)
+      throw new HttpException('Token de Banxico no configurado', HttpStatus.INTERNAL_SERVER_ERROR);
+
+    const BANXICO_SERIES: Record<string, string> = {
+      USD: 'SF43718',
+      EUR: 'SF46410',
+      JPY: 'SF46406',
+      GBP: 'SF46407',
+      CAD: 'SF60632',
+    };
+
+    const serie = BANXICO_SERIES[moneda];
+    if(!serie)
+      throw new HttpException(
+        `Moneda ${moneda} no disponible en Banxico`,
+        HttpStatus.NOT_FOUND,
+      );
+    
+    try {
+      let url: string;
+
+      if(fecha) {
+        const fechaFin = fecha;
+        const fechaIni = new Date(new Date(fecha).getTime() - 7 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .slice(0, 10);
+        url = `https://www.banxico.org.mx/SieAPIRest/service/v1/series/${serie}/datos/${fechaIni}/${fechaFin}`;
+      } else
+          url = `https://www.banxico.org.mx/SieAPIRest/service/v1/series/${serie}/datos/oportuno`;
+        
+      const response = await fetch(url, {
+        headers: { 'Bmx-Token': BANXICO_TOKEN } as HeadersInit,
+      });
+
+
+      if(!response.ok)
+        throw new HttpException('Error al consultar Banxico', HttpStatus.BAD_GATEWAY);
+
+      const data = await response.json();
+      const datos = data.bmx.series[0].datos;
+
+      if(!datos?.length)
+            throw new HttpException('Sin datos para esa fecha', HttpStatus.NOT_FOUND);
+
+      const ultimo = datos[datos.length - 1];
+
+      return {
+        tipoCambio: parseFloat(ultimo.dato),
+        fecha: ultimo.fecha,
+        moneda,
+      };
+    } catch(error) {
+      if(error instanceof HttpException) throw error;
+      const message = error instanceof Error ? error.message : 'Error desconocido';
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

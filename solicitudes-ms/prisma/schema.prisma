@@ -90,7 +90,7 @@ model TiposCambio {
   factura_id            Int                 @unique
   fecha_tipo_cambio     DateTime
   moneda                String
-  tipo_cambio           Decimal             @db.Decimal(10, 2)
+  tipo_cambio           Decimal             @db.Decimal(10, 4)
 
   factura               Factura @relation(fields: [factura_id], references: [factura_id])
 

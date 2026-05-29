@@ -117,15 +117,41 @@ export class SolicitudesController {
     return this.solicitudesService.editarSolicitud(userId, editDto);
   }
 
-  @Post('upload-comprobante')
+  // Comprobante de anticipo (Imagen transferencia)
+  @Post('upload/comprobante/anticipo')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file', multerConfig))
-  async uploadComprobante(@UploadedFile() file: Express.Multer.File){
-    if(!file)
-      throw new BadRequestException('No se ha enviado ningún archivo');
+  @UseInterceptors(FileInterceptor('file', multerConfig('comprobantes/anticipos', 'ant')))
+  async uploadAnticipo(@UploadedFile() file: Express.Multer.File){
+    if(!file) throw new BadRequestException('No se ha enviado ningún archivo');
 
-    // Construir la ruta relativa que se guardará en la BD
-    const rutaRelativa = `uploads/comprobantes/${file.filename}`;
-    return { ruta: rutaRelativa };
+    const ruta = `uploads/comprobantes/anticipos/${file.filename}`;
+    return { ruta };
+  }
+
+  // Comprobante de liquidación
+  @Post('upload/comprobante/liquidacion')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file', multerConfig('comprobantes/liquidaciones', 'liq')))
+  async uploadLiquidacion(@UploadedFile() file: Express.Multer.File) {
+    if(!file) throw new BadRequestException('No se ha enviado ningún archivo');
+
+    const ruta = `uploads/comprobantes/liquidaciones/${file.filename}`;
+    return { ruta };
+  }
+
+  @Get('aprobadas-pendientes')
+  @UseGuards(JwtAuthGuard)
+  async getSolicitudesAprobadas(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getSolicitudesAprobadas(userId);
+  }
+
+  @Get('tipocambio/:moneda')
+  @UseGuards(JwtAuthGuard)
+  async getTipoCambio(
+    @Param('moneda') moneda: string,
+    @Query('fecha') fecha?: string,
+  ){
+    return this.solicitudesService.getTipoCambio(moneda.toUpperCase(), fecha);
   }
 }
