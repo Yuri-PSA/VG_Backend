@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { SolicitudesModule } from './solicitudes/solicitudes.module';
 import { ComprobacionesModule } from './comprobaciones/comprobaciones.module';
+import { LiquidacionesModule } from './liquidaciones/liquidaciones.module';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { ComprobacionesModule } from './comprobaciones/comprobaciones.module';
       signOptions: { expiresIn: '8h' },
     }),
     PrismaModule, 
-    SolicitudesModule, ComprobacionesModule
+    SolicitudesModule, ComprobacionesModule, LiquidacionesModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UseInterceptors, UploadedFile, BadRequestException, Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ComprobacionesService } from './comprobaciones.service';
 import { CreateComprobacioneDto } from './dto/create-comprobacione.dto';
@@ -45,5 +45,64 @@ export class ComprobacionesController {
     if(!file) throw new BadRequestException('No se ha enviado ningún archivo');
     const ruta = `uploads/facturas/img/${file.filename}`;
     return { ruta };
+  }
+
+  @Get('listar')
+  @UseGuards(JwtAuthGuard)
+  async listar(
+    @Req() req,
+    @Query('estado') estado?: string,
+    @Query('folio') folio?: string,
+    @Query('fechaIni') fechaIni?: string,
+    @Query('fechaFin') fechaFin?: string,
+    @Query('solicitud') solicitud?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+    @Query('orden') orden?: string,
+    @Query('ordenSols') ordenSols?: string,
+    @Query('ordenTotal') ordenTotal?: string,
+    @Query('ordenSaldo') ordenSaldo?: string,
+  ){
+    const userId = req.user.usuario_id;
+
+    return this.comprobacionesService.listarComprobaciones(
+      userId,
+      estado,
+      folio,
+      fechaIni,
+      fechaFin,
+      solicitud,
+      limit ? parseInt(limit, 10) : 7,
+      offset ? parseInt(offset, 10) : 0,
+      orden,
+      ordenSols,
+      ordenTotal,
+      ordenSaldo,
+    );
+  }
+
+  @Patch('estado')
+  @UseGuards(JwtAuthGuard)
+  async updateState(
+    @Req() req,
+    @Body() body: { folio: string; accion: string; motivoRechazo?: string },
+  ){
+    const userId = req.user.usuario_id;
+    return this.comprobacionesService.updateComprobacion(
+      userId, 
+      body.folio, 
+      body.accion, 
+      body.motivoRechazo,
+    );
+  }
+
+  @Get('detalle')
+  @UseGuards(JwtAuthGuard)
+  async obtenerDetalle(
+    @Req() req,
+    @Query('folio') folio: string,
+  ){
+    const userId = req.user.usuario_id;
+    return this.comprobacionesService.detalleComprobacion(userId, folio);
   }
 }

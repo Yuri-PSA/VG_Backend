@@ -43,6 +43,7 @@ model Comprobacion {
   fecha_comprobacion    DateTime            @default(now())
   total_importe         Decimal             @db.Decimal(10, 2)
   total_iva             Decimal             @db.Decimal(10, 2)
+  total_otros           Decimal             @default(0) @db.Decimal(10, 2)
   total                 Decimal             @db.Decimal(10, 2)
   total_moneda          String
   saldo                 Decimal             @db.Decimal(10, 2)
@@ -62,7 +63,7 @@ model Comprobacion {
 model Factura {
   factura_id            Int                 @id @default(autoincrement())
   comprobacion_id       Int
-  folio_factura         String              @unique
+  folio_factura         String
   fecha_factura         DateTime
   proveedor             String
   concepto              String
@@ -71,7 +72,6 @@ model Factura {
   iva                   Decimal             @db.Decimal(10, 2)
   otros_montos          Decimal             @default(0) @db.Decimal(10, 2)
   total                 Decimal             @db.Decimal(10, 2)
-  total_moneda          Decimal             @db.Decimal(10, 2)
   tipo_moneda           String
   ruta_xml              String?
   ruta_pdf              String?
