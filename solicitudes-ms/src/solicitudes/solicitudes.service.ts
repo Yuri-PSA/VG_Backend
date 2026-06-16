@@ -42,6 +42,7 @@ export class SolicitudesService {
     offset: number = 0,
     orden: string = 'ASC',
     ordenMonto?: string,
+    ordenFinanza?: string,
   ){
     const result = await this.prisma.$queryRaw<
       Array<{
@@ -72,9 +73,9 @@ export class SolicitudesService {
         ${limit}::INT,
         ${offset}::INT,
         ${orden}::VARCHAR,
-        ${ordenMonto || null}::VARCHAR
-      )
-    `;
+        ${ordenMonto || null}::VARCHAR,
+        ${ordenFinanza || null}::VARCHAR
+      )`;
 
     // Información de paginación y conteos
     const firstRow = result[0];
@@ -164,8 +165,7 @@ export class SolicitudesService {
       SELECT * FROM core.sp_obtener_sol(
         ${userId}::INT,
         ${folio}::VARCHAR
-      )
-    `;
+      )`;
 
     const row = result[0];
     if(!row || row.mensaje)
@@ -338,5 +338,194 @@ export class SolicitudesService {
       const message = error instanceof Error ? error.message : 'Error desconocido';
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async getEstadoFinan(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        mensaje: string | null;
+        estado_financiero: string | null;
+      }>
+    >`
+      SELECT * FROM core.sp_obtener_financiero( ${userId}::INT )
+    `;
+
+    if(result.length > 0 && result[0].mensaje)
+      throw new HttpException(result[0].mensaje, HttpStatus.BAD_REQUEST);
+
+    return result
+      .filter(r => r.estado_financiero !== null)
+      .map(r => r.estado_financiero);
+  }
+
+  // Dashboard
+  async getEstadosMensuales(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        tipo: string | null;
+        anio: number | null;
+        mes: number | null;
+        pendientes: bigint | null;
+        aprobadas: bigint | null;
+        rechazadas: bigint | null;
+        canceladas: bigint | null;
+        total: bigint | null;
+      }>
+    >`
+      SELECT * FROM core.sp_estados_mensuales( ${userId}::INT )
+      WHERE tipo = 'Solicitud'
+    `;
+
+    return result.map(row => ({
+      tipo: row.tipo,
+      anio: Number(row.anio),
+      mes: Number(row.mes),
+      pendientes: row.pendientes ? Number(row.pendientes) : 0,
+      aprobadas: row.aprobadas ? Number(row.aprobadas) : 0,
+      rechazadas: row.rechazadas ? Number(row.rechazadas) : 0,
+      canceladas: row.canceladas ? Number(row.canceladas) : 0,
+      total: row.total ? Number(row.total) : 0
+    }));
+  }
+
+  // colaboradores
+  async getRangeYears(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        tipo: string | null;
+        min_anio: number | null;
+        max_anio: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_rangeyears_colab( ${userId}::INT )
+      WHERE tipo = 'Solicitud'
+    `;
+
+    return result.map(row => ({
+      tipo: row.tipo,
+      min_anio: Number(row.min_anio),
+      max_anio: Number(row.max_anio)
+    }));
+  }
+
+  async getMontosAprobados(userId: number, year: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        mes: number | null;
+        monto: number | null;
+        moneda: string | null;
+      }>
+    >`
+      SELECT * FROM core.sp_totalapr_colab(
+        ${userId}::INT,
+        ${year}::INT
+      )`;
+
+    return result.map(row => ({
+      mes: Number(row.mes),
+      monto: row.monto ? Number(row.monto) : 0,
+      moneda: row.moneda,
+    }));
+  }
+
+  // jefes
+  async getCantidadesJefe(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        estado: string | null;
+        cantidad: bigint | null;
+      }>
+    >`
+      SELECT * FROM core.sp_cantidad_sols_jefe( ${userId}::INT )
+    `;
+
+    return result.map(row => ({
+      estado: row.estado,
+      cantidad: row.cantidad ? Number(row.cantidad) : 0,
+    }));
+  }
+
+  async getRangeYearsJefe(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        tipo: string | null;
+        min_anio: number | null;
+        max_anio: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_rangeyears_jefe( ${userId}::INT )
+    `;
+
+    const rangos: { 
+      enviadas?: { min: number; max: number }; 
+      aprobadas?: { min: number; max: number } 
+    } = {};
+
+    for(const row of result) {
+      if(row.tipo === 'Enviadas' && row.min_anio && row.max_anio)
+        rangos.enviadas = { min: Number(row.min_anio), max: Number(row.max_anio) };
+
+      else if(row.tipo === 'Aprobadas' && row.min_anio && row.max_anio)
+        rangos.aprobadas = { min: Number(row.min_anio), max: Number(row.max_anio) };
+    }
+
+    return rangos;
+  }
+
+  async getTendMensuales(userId: number, year: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        mes: number | null;
+        solicitudes: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_tendencia_sols_jefe(
+        ${userId}::INT,
+        ${year}::INT 
+      )`;
+    
+    return result.map(row => ({
+      mes: Number(row.mes),
+      solicitudes: row.solicitudes ? Number(row.solicitudes) : 0,
+    }));
+  }
+
+  async getGastoMensual(userId: number, year: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        mes: number | null;
+        monto: number | null;
+        moneda: string | null;
+      }>
+    >`
+      SELECT * FROM core.sp_gasto_jefe(
+        ${userId}::INT,
+        ${year}::INT
+      )`;
+
+    return result.map(row => ({
+      mes: Number(row.mes),
+      monto: row.monto ? Number(row.monto) : 0,
+      moneda: row.moneda,
+    }));
+  }
+
+  // tesoreros
+  async getCantidadesTes(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        anticipos: bigint | null;
+        comprobaciones: bigint | null;
+        liquidaciones: bigint | null;
+      }>
+    >`
+      SELECT * FROM core.sp_cantidad_cards_tes( ${userId}::INT )
+    `;
+
+    return result.map(row => ({
+      anticipos: row.anticipos ? Number(row.anticipos) : 0,
+      comprobaciones: row.comprobaciones ? Number(row.comprobaciones) : 0,
+      liquidaciones: row.liquidaciones ? Number(row.liquidaciones) : 0
+    }));
   }
 }

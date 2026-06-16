@@ -9,7 +9,10 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: 'http://127.0.0.1:5500',
+    origin: [
+      'http://127.0.0.1:5500',
+      'https://yuri-psa.github.io',
+    ],
     credentials: true,
   });
 

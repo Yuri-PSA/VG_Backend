@@ -23,6 +23,7 @@ export class LiquidacionesController {
     @Query('ordenAnt') ordenAnt?: string,
     @Query('ordenCmp') ordenCmp?: string,
     @Query('ordenSaldo') ordenSaldo?: string,
+    @Query('ordenAjuste') ordenAjuste?: string,
   ){
     const userId = req.user.usuario_id;
 
@@ -36,6 +37,7 @@ export class LiquidacionesController {
       ordenAnt,
       ordenCmp,
       ordenSaldo,
+      ordenAjuste,
     );
   }
 
@@ -46,5 +48,55 @@ export class LiquidacionesController {
     if(!file) throw new BadRequestException('No se ha enviado ningún archivo');
     const ruta = `uploads/comprobantes/liquidaciones/${file.filename}`;
     return { ruta };
+  }
+
+  @Patch('comprobante')
+  @UseGuards(JwtAuthGuard)
+  async gestionarLiquid(
+    @Req() req,
+    @Body() body: {
+      solicitud: string;
+      fechaPago?: string;
+      fechaRecibido?: string;
+      rutaComprobante?: string;
+      noRecibido?: boolean;
+    },
+  ){
+    const userId = req.user.usuario_id;
+
+    return this.liquidacionesService.gestionarLiquid(
+      userId,
+      body.solicitud,
+      body.fechaPago,
+      body.fechaRecibido,
+      body.rutaComprobante,
+      body.noRecibido,
+    );
+  }
+
+  @Get('detalle')
+  @UseGuards(JwtAuthGuard)
+  async obtenerDetalle(
+    @Req() req,
+    @Query('solicitud') solicitud: string,
+  ){
+    const userId = req.user.usuario_id;
+    return this.liquidacionesService.detalleLiquidacion(userId, solicitud);
+  }
+
+  @Get('ajustes')
+  @UseGuards(JwtAuthGuard)
+  async obtenerAjuste(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.liquidacionesService.obtenerAjuste(userId);
+  }
+
+  // Dashboard
+  // colaborador
+  @Get('dashboard/reem-dev')
+  @UseGuards(JwtAuthGuard)
+  async getCardLiquids(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.liquidacionesService.getCardLiquids(userId);
   }
 }

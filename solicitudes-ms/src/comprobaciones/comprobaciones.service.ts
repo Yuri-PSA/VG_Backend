@@ -217,4 +217,72 @@ export class ComprobacionesService {
 
     return { comprobacion, facturas };
   }
+
+  // Dashboard
+  async getEstadosMensuales(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        tipo: string | null;
+        anio: number | null;
+        mes: number | null;
+        pendientes: bigint | null;
+        aprobadas: bigint | null;
+        rechazadas: bigint | null;
+        canceladas: bigint | null;
+        total: bigint | null;
+      }>
+    >`
+      SELECT * FROM core.sp_estados_mensuales( ${userId}::INT )
+      WHERE tipo = 'Comprobación'
+    `;
+
+    return result.map(row => ({
+      tipo: row.tipo,
+      anio: Number(row.anio),
+      mes: Number(row.mes),
+      pendientes: row.pendientes ? Number(row.pendientes) : 0,
+      aprobadas: row.aprobadas ? Number(row.aprobadas) : 0,
+      rechazadas: row.rechazadas ? Number(row.rechazadas) : 0,
+      canceladas: row.canceladas ? Number(row.canceladas) : 0,
+      total: row.total ? Number(row.total) : 0
+    }));
+  }
+
+  // colaboradores
+  async getRangeYears(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        tipo: string | null;
+        min_anio: number | null;
+        max_anio: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_rangeyears_colab( ${userId}::INT )
+      WHERE tipo = 'Comprobación'
+    `;
+
+    return result.map(row => ({
+      tipo: row.tipo,
+      min_anio: Number(row.min_anio),
+      max_anio: Number(row.max_anio)
+    }));
+  }
+
+  async getTotalComprobado(userId: number, year: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        mes: number | null;
+        total_comprobado: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_totalcomp_colab( 
+        ${userId}::INT, 
+        ${year}::INT 
+      )`;
+
+    return result.map(row => ({
+      mes: Number(row.mes),
+      total_comprobado: row.total_comprobado ? Number(row.total_comprobado) : 0,
+    }));
+  }
 }

@@ -31,6 +31,7 @@ export class SolicitudesController {
     @Query('offset') offset?: string,
     @Query('orden') orden?: string,
     @Query('ordenMonto') ordenMonto?: string,
+    @Query('ordenFinanza') ordenFinanza?: string,
   ){
     const userId = req.user.usuario_id;
     
@@ -45,6 +46,7 @@ export class SolicitudesController {
       offset ? parseInt(offset, 10) : 0,
       orden || 'DESC',
       ordenMonto,
+      ordenFinanza,
     );
   }
 
@@ -153,5 +155,81 @@ export class SolicitudesController {
     @Query('fecha') fecha?: string,
   ){
     return this.solicitudesService.getTipoCambio(moneda.toUpperCase(), fecha);
+  }
+
+  @Get('estado-financiero')
+  @UseGuards(JwtAuthGuard)
+  async getEstadoFinan(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getEstadoFinan(userId);
+  }
+
+  // Dashboard
+  @Get('dashboard/estados')
+  @UseGuards(JwtAuthGuard)
+  async getEstadosMensuales(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getEstadosMensuales(userId);
+  }
+
+  // colaboradores
+  @Get('dashboard/years')
+  @UseGuards(JwtAuthGuard)
+  async getRangeYears(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getRangeYears(userId);
+  }
+
+  @Get('dashboard/aprobado')
+  @UseGuards(JwtAuthGuard)
+  async getMontosAprobados(
+    @Req() req,
+    @Query('year') year: number,
+  ){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getMontosAprobados(userId, year);
+  }
+
+  // jefes
+  @Get('dashboard/cantidad-solicitudes')
+  @UseGuards(JwtAuthGuard)
+  async getCantidadesJefe(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getCantidadesJefe(userId);
+  }
+
+  @Get('dashboard/years-jefes')
+  @UseGuards(JwtAuthGuard)
+  async getRangeYearsJefe(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getRangeYearsJefe(userId);
+  }
+
+  @Get('dashboard/tendencia')
+  @UseGuards(JwtAuthGuard)
+  async getTendMensuales(
+    @Req() req,
+    @Query('year') year: number
+  ){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getTendMensuales(userId, year);
+  }
+
+  @Get('dashboard/gasto')
+  @UseGuards(JwtAuthGuard)
+  async getGastoMensual(
+    @Req() req,
+    @Query('year') year: number
+  ){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getGastoMensual(userId, year);
+  }
+
+  // tesoreros
+  @Get('dashboard/cantidad-tes')
+  @UseGuards(JwtAuthGuard)
+  async getCantidadesTes(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getCantidadesTes(userId);
   }
 }

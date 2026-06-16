@@ -105,4 +105,29 @@ export class ComprobacionesController {
     const userId = req.user.usuario_id;
     return this.comprobacionesService.detalleComprobacion(userId, folio);
   }
+
+  // Dashboard
+  @Get('dashboard/estados')
+  @UseGuards(JwtAuthGuard)
+  async getEstadosMensuales(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.comprobacionesService.getEstadosMensuales(userId);
+  }
+
+  @Get('dashboard/years')
+  @UseGuards(JwtAuthGuard)
+  async getRangeYears(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.comprobacionesService.getRangeYears(userId);
+  }
+
+  @Get('dashboard/comprobado')
+  @UseGuards(JwtAuthGuard)
+  async getTotalComprobado(
+    @Req() req, 
+    @Query('year') year: number
+  ){
+    const userId = req.user.usuario_id;
+    return this.comprobacionesService.getTotalComprobado(userId, year);
+  }
 }
