@@ -285,4 +285,24 @@ export class ComprobacionesService {
       total_comprobado: row.total_comprobado ? Number(row.total_comprobado) : 0,
     }));
   }
+
+  // tesoreros
+  async getRangeYearsTes(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        tipo: string | null;
+        min_anio: number | null;
+        max_anio: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_rangeyears_tes( ${userId}::INT )
+      WHERE tipo = 'Comprobación'
+    `;
+
+    return result.map(row => ({
+      tipo: row.tipo,
+      min_anio: Number(row.min_anio),
+      max_anio: Number(row.max_anio)
+    }));
+  }
 }

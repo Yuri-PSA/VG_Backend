@@ -528,4 +528,43 @@ export class SolicitudesService {
       liquidaciones: row.liquidaciones ? Number(row.liquidaciones) : 0
     }));
   }
+
+  async getRangeYearsTes(userId: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        tipo: string | null;
+        min_anio: number | null;
+        max_anio: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_rangeyears_tes( ${userId}::INT )
+      WHERE tipo = 'Anticipo'
+    `;
+
+    return result.map(row => ({
+      tipo: row.tipo,
+      min_anio: Number(row.min_anio),
+      max_anio: Number(row.max_anio)
+    }));
+  }
+
+  async getAnticipos(userId: number, year: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        mes: number | null;
+        monto: number | null;
+        moneda: string | null;
+      }>
+    >`
+      SELECT * FROM core.sp_totalapr_tes(
+        ${userId}::INT,
+        ${year}::INT
+      )`;
+
+    return result.map(row => ({
+      mes: Number(row.mes),
+      monto: row.monto ? Number(row.monto) : 0,
+      moneda: row.moneda,
+    }));
+  }
 }

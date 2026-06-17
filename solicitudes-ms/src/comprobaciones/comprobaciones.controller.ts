@@ -114,6 +114,7 @@ export class ComprobacionesController {
     return this.comprobacionesService.getEstadosMensuales(userId);
   }
 
+  // colaboradores
   @Get('dashboard/years')
   @UseGuards(JwtAuthGuard)
   async getRangeYears(@Req() req){
@@ -129,5 +130,13 @@ export class ComprobacionesController {
   ){
     const userId = req.user.usuario_id;
     return this.comprobacionesService.getTotalComprobado(userId, year);
+  }
+
+  // tesoreros
+  @Get('dashboard/years-tes')
+  @UseGuards(JwtAuthGuard)
+  async getRangeYearsTes(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.comprobacionesService.getRangeYearsTes(userId);
   }
 }

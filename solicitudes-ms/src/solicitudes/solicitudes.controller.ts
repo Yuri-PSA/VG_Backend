@@ -232,4 +232,21 @@ export class SolicitudesController {
     const userId = req.user.usuario_id;
     return this.solicitudesService.getCantidadesTes(userId);
   }
+
+  @Get('dashboard/years-tes')
+  @UseGuards(JwtAuthGuard)
+  async getRangeYearsTes(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getRangeYearsTes(userId);
+  }
+
+  @Get('dashboard/anticipos')
+  @UseGuards(JwtAuthGuard)
+  async getAnticipos(
+    @Req() req,
+    @Query('year') year: number,
+  ){
+    const userId = req.user.usuario_id;
+    return this.solicitudesService.getAnticipos(userId, year);
+  }
 }
