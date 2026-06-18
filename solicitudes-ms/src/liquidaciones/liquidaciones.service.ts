@@ -180,4 +180,46 @@ export class LiquidacionesService {
       devoluciones: row.devoluciones ? Number(row.devoluciones) : 0,
     }));
   }
+
+  // tesorero
+  async getAjustesMens(userId: number, year: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        mes: number | null;
+        devoluciones: number | null;
+        reembolsos: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_liqmxn_tes( 
+        ${userId}::INT, 
+        ${year}::INT 
+      )`;
+
+    const data = result.filter(r => r.mes !== null);
+
+    if(data.length === 0)
+      return [];
+
+    return data.map(r => ({
+      mes: Number(r.mes),
+      devoluciones: Number(r.devoluciones),
+      reembolsos: Number(r.reembolsos),
+    }));
+  }
+
+  async getYearsTes(userId){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        min_anio: number | null;
+        max_anio: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_rangeyears_liq_tes( ${userId}::INT )
+    `;
+
+    return result.map(row => ({
+      min_anio: Number(row.min_anio),
+      max_anio: Number(row.max_anio)
+    }));
+  }
 }

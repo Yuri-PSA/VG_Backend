@@ -13,6 +13,40 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth_service
+    restart: always
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./auth-service/.env
+    depends_on:
+      - postgres
+
+  solicitudes-ms:
+    build: ./solicitudes-ms
+    container_name: solicitudes_ms
+    restart: always
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./solicitudes-ms/.env
+    depends_on:
+      - postgres
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api_gateway
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./api-gateway/.env
+    depends_on:
+      - auth-service
+      - solicitudes-ms
+
 volumes:
   pgdata:

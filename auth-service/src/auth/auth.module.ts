@@ -5,13 +5,15 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PrismaModule } from '../prisma/prisma.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     PrismaModule,
     PassportModule,
+    ConfigModule.forRoot({ isGlobal: true }), 
     JwtModule.register({
-      secret: 'Lo movemos a env?',
+      secret: process.env.JWT_SECRET!,
       signOptions: { expiresIn: '8h' },
     }),
   ],

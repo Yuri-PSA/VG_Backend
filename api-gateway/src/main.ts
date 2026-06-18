@@ -8,6 +8,9 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
+  const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3003';
+  const SOLICITUDES_MS_URL = process.env.SOLICITUDES_MS_URL || 'http://localhost:3002';
+
   app.use((req, res, next) => {
     const allowedOrigins = [
       'http://127.0.0.1:5500',
@@ -31,7 +34,7 @@ async function bootstrap() {
   // Proxy para auth-service
   app.use(
     createProxyMiddleware({
-      target: 'http://localhost:3003',
+      target: AUTH_SERVICE_URL,
       changeOrigin: true,
       pathFilter: '/auth',
     }),
@@ -40,7 +43,7 @@ async function bootstrap() {
   // Proxy para solicitudes-ms
   app.use(
     createProxyMiddleware({
-      target: 'http://localhost:3002',
+      target: SOLICITUDES_MS_URL,
       changeOrigin: true,
       pathFilter: '/uploads',
     }),
@@ -48,7 +51,7 @@ async function bootstrap() {
 
   app.use(
     createProxyMiddleware({
-      target: 'http://localhost:3002',
+      target: SOLICITUDES_MS_URL,
       changeOrigin: true,
       pathFilter: '/api',
       pathRewrite: {

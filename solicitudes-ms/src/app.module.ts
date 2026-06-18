@@ -12,7 +12,7 @@ import { LiquidacionesModule } from './liquidaciones/liquidaciones.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), 
     JwtModule.register({
-      secret: 'Lo movemos a env?',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '8h' },
     }),
     PrismaModule, 

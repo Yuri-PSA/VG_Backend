@@ -99,4 +99,22 @@ export class LiquidacionesController {
     const userId = req.user.usuario_id;
     return this.liquidacionesService.getCardLiquids(userId);
   }
+
+  // tesorero
+  @Get('dashboard/liquidaciones')
+  @UseGuards(JwtAuthGuard)
+  async getAjustesMens(
+    @Req() req, 
+    @Query('year') year: number
+  ){
+    const userId = req.user.usuario_id;
+    return this.liquidacionesService.getAjustesMens(userId, year);
+  }
+
+  @Get('dashboard/years-liq')
+  @UseGuards(JwtAuthGuard)
+  async getYearsTes(@Req() req){
+    const userId = req.user.usuario_id;
+    return this.liquidacionesService.getYearsTes(userId);
+  }
 }

@@ -139,4 +139,14 @@ export class ComprobacionesController {
     const userId = req.user.usuario_id;
     return this.comprobacionesService.getRangeYearsTes(userId);
   }
+
+  @Get('dashboard/comprobado-tes')
+  @UseGuards(JwtAuthGuard)
+  async getComprobadoTes(
+    @Req() req, 
+    @Query('year') year: number
+  ){
+    const userId = req.user.usuario_id;
+    return this.comprobacionesService.getComprobadoTes(userId, year);
+  }
 }

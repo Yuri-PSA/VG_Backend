@@ -305,4 +305,22 @@ export class ComprobacionesService {
       max_anio: Number(row.max_anio)
     }));
   }
+
+  async getComprobadoTes(userId: number, year: number){
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        mes: number | null;
+        total_mxn: number | null;
+      }>
+    >`
+      SELECT * FROM core.sp_totalcomp_tes( 
+        ${userId}::INT, 
+        ${year}::INT 
+      )`;
+    
+    return result.map(row => ({
+      mes: Number(row.mes),
+      total_mxn: row.total_mxn ? Number(row.total_mxn) : 0,
+    }));
+  }
 }
