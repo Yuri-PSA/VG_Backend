@@ -22,7 +22,7 @@ export class AuthController {
             path: '/',
         });
 
-        return { usuario };
+        return { access_token, usuario };
     }
 
     @Post('logout')

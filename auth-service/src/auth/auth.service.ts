@@ -18,9 +18,10 @@ export class AuthService {
                 password: string;
                 nombre: string;
                 apellidos: string; 
+                activo: boolean;
             }>
         >(
-            `SELECT usuario_id, correo, rol, password, nombre, apellidos
+            `SELECT usuario_id, correo, rol, password, nombre, apellidos, activo
             FROM auth.usuario
             WHERE correo = $1`,
             correo,
@@ -30,6 +31,9 @@ export class AuthService {
             throw new UnauthorizedException('Credenciales incorrectas. Por favor, verifica tu correo y contraseña');
 
         const usuario = user[0];
+
+        if(!usuario.activo)
+            throw new UnauthorizedException('Tu cuenta ha sido desactivada. Por favor, contacta al administrador');
 
         const result = await this.prisma.$queryRawUnsafe<Array<{ match: boolean }>>(
             `SELECT (password = crypt($1, password)) AS match
@@ -44,7 +48,7 @@ export class AuthService {
         const shortName = `${firstName} ${lastName}`;
 
         if(result[0]?.match) {
-            const { password, ...rest } = usuario;
+            const { password, activo, ...rest } = usuario;
             return { ...rest, nombre: shortName }; // return data without password
         }
         throw new UnauthorizedException('Credenciales incorrectas. Por favor, verifica tu correo y contraseña');
