@@ -1,10 +1,21 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { AzureSyncService } from './azure-sync.service';
 import express from 'express';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly azureSyncService: AzureSyncService,
+    ) {}
+
+    // AZURE -> manual
+    @Post('sync')
+    async syncManual() {
+        await this.azureSyncService.syncManual();
+        return { message: 'Sincronización completada' };
+    }
 
     @Post('login')
     async login(

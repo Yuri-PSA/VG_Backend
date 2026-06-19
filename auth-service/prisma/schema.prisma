@@ -14,7 +14,7 @@ model Usuario {
   nombre                String
   apellidos             String
   correo                String              @unique
-  password              String
+  password              String?
   rol                   Rol
   departamento          String
   activo                Boolean             @default(true)
