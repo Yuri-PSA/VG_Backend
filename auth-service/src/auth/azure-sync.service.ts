@@ -1,14 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfidentialClientApplication } from '@azure/msal-node';
 
 @Injectable()
-export class AzureSyncService {
+export class AzureSyncService implements OnModuleInit {
     private readonly logger = new Logger(AzureSyncService.name);
-    private readonly msalClient: ConfidentialClientApplication;
+    private msalClient!: ConfidentialClientApplication;
 
-    constructor(private readonly prisma: PrismaService) {
+    constructor(private readonly prisma: PrismaService) {}
+
+    onModuleInit() {
         this.msalClient = new ConfidentialClientApplication({
             auth: {
                 clientId: process.env.AZURE_CLIENT_ID!,
@@ -16,6 +18,7 @@ export class AzureSyncService {
                 authority: `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}`,
             },
         });
+        this.logger.log('AzureSyncService inicializado correctamente');
     }
 
     // ── Token de acceso ───────────────────────────────────────
