@@ -218,6 +218,30 @@ export class ComprobacionesService {
     return { comprobacion, facturas };
   }
 
+  async editarComp(userId: number, dto: UpdateComprobacioneDto){
+    const facturasJson = JSON.stringify(dto.facturas);
+
+    const result = await this.prisma.$queryRaw<
+      Array<{
+        mensaje: string | null;
+        enviado: boolean | null;
+      }>
+    >`
+      SELECT * FROM core.sp_editar_comprobacion(
+        ${userId}::INT,
+        ${dto.folio_comp}::VARCHAR,
+        ${dto.fecha_comp}::DATE,
+        ${facturasJson}::JSONB
+      )`;
+
+    const respuesta = result[0];
+
+    if(!respuesta || !respuesta.enviado)
+      throw new HttpException(respuesta?.mensaje || 'Error al editar la comprobación', HttpStatus.BAD_REQUEST);
+
+    return { mensaje: respuesta.mensaje, success: true };
+  }
+
   // Dashboard
   async getEstadosMensuales(userId: number){
     const result = await this.prisma.$queryRaw<

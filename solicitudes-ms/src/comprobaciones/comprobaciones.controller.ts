@@ -106,6 +106,16 @@ export class ComprobacionesController {
     return this.comprobacionesService.detalleComprobacion(userId, folio);
   }
 
+  @Patch('editar')
+  @UseGuards(JwtAuthGuard)
+  async editarComp(
+    @Req() req,
+    @Body() dto: UpdateComprobacioneDto,
+  ){
+    const userId = req.user.usuario_id;
+    return this.comprobacionesService.editarComp(userId, dto);
+  }
+
   // Dashboard
   @Get('dashboard/estados')
   @UseGuards(JwtAuthGuard)
