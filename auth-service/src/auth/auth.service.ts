@@ -9,6 +9,69 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ) {}
 
+    async loginMicrosoft(microsoftToken: string) {
+        // Validar token con Microsoft Graph
+        const graphRes = await fetch('https://graph.microsoft.com/v1.0/me', {
+            headers: { Authorization: `Bearer ${microsoftToken}` }
+        });
+
+        if(!graphRes.ok)
+            throw new UnauthorizedException('Token de Microsoft inválido');
+
+        const msUser = await graphRes.json();
+        const correo = msUser.mail || msUser.userPrincipalName;
+
+        if(!correo)
+            throw new UnauthorizedException('Lo siento, no se pudo obtener el correo de Microsoft');
+
+        // Buscar usuario en BD
+        const users = await this.prisma.$queryRawUnsafe<
+            Array<{
+                usuario_id: number;
+                correo: string;
+                rol: string;
+                nombre: string;
+                apellidos: string;
+                activo: boolean;
+            }>
+        >(
+            `SELECT usuario_id, correo, rol, nombre, apellidos, activo
+            FROM auth.usuario
+            WHERE correo = $1`,
+            correo,
+        );
+
+        if(users.length === 0)
+            throw new UnauthorizedException('Ha habido un problema con tu cuenta. Por favor, contacta al administrador');
+
+        const usuario = users[0];
+
+        if(!usuario.activo)
+            throw new UnauthorizedException('Tu cuenta ha sido desactivada. Por favor, contacta al administrador');
+
+        const firstName = usuario.nombre.split(' ')[0];
+        const lastName  = usuario.apellidos.split(' ')[0];
+        const shortName = `${firstName} ${lastName}`;
+
+        const payload = {
+            sub: usuario.usuario_id,
+            correo: usuario.correo,
+            rol: usuario.rol,
+            nombre: shortName,
+        };
+
+        return {
+            access_token: this.jwtService.sign(payload),
+            usuario: {
+                usuario_id: usuario.usuario_id,
+                correo: usuario.correo,
+                rol: usuario.rol,
+                nombre: shortName,
+            },
+        };
+    }
+
+    // Borrar después (se usa para local)
     async validateUser(correo: string, plainPassword: string): Promise<any> {
         const user = await this.prisma.$queryRawUnsafe<
             Array<{ 
