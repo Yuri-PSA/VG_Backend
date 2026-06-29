@@ -22,6 +22,7 @@ export class SolicitudesController {
   @UseGuards(JwtAuthGuard)
   async listar(
     @Req() req,
+    @Query('vista') vista?: string,
     @Query('estado') estado?: string,
     @Query('folio') folio?: string,
     @Query('fechaIni') fechaIni?: string,
@@ -32,11 +33,16 @@ export class SolicitudesController {
     @Query('orden') orden?: string,
     @Query('ordenMonto') ordenMonto?: string,
     @Query('ordenFinanza') ordenFinanza?: string,
+    @Query('ordenColaborador') ordenColaborador?: string,
+    @Query('ordenPago') ordenPago?: string,
+    @Query('ordenFinanciero') ordenFinanciero?: string,
+    @Query('ordenDestino') ordenDestino?: string
   ){
     const userId = req.user.usuario_id;
     
     return this.solicitudesService.listarSolicitudes(
       userId,
+      vista,
       estado,
       folio,
       fechaIni,
@@ -47,6 +53,10 @@ export class SolicitudesController {
       orden || 'DESC',
       ordenMonto,
       ordenFinanza,
+      ordenColaborador,
+      ordenPago,
+      ordenFinanciero,
+      ordenDestino
     );
   }
 
@@ -70,9 +80,10 @@ export class SolicitudesController {
   async obtenerDetalle(
     @Req() req,
     @Query('folio') folio: string,
+    @Query('vista') vista?: string
   ){
     const userId = req.user.usuario_id;
-    return this.solicitudesService.detalleSolicitud(userId, folio);
+    return this.solicitudesService.detalleSolicitud(userId, folio, vista);
   }
 
   @Patch('cancelar')
@@ -167,9 +178,12 @@ export class SolicitudesController {
   // Dashboard
   @Get('dashboard/estados')
   @UseGuards(JwtAuthGuard)
-  async getEstadosMensuales(@Req() req){
+  async getEstadosMensuales(
+    @Req() req,
+    @Query('vista') vista?: string
+  ){
     const userId = req.user.usuario_id;
-    return this.solicitudesService.getEstadosMensuales(userId);
+    return this.solicitudesService.getEstadosMensuales(userId, vista);
   }
 
   // colaboradores

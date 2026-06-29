@@ -15,6 +15,7 @@ export class LiquidacionesController {
   @UseGuards(JwtAuthGuard)
   async listar(
     @Req() req,
+    @Query('vista') vista?: string,
     @Query('estado') estado?: string,
     @Query('solicitud') solicitud?: string,
     @Query('limit') limit?: string,
@@ -29,6 +30,7 @@ export class LiquidacionesController {
 
     return this.liquidacionesService.listarLiquid(
       userId,
+      vista,
       estado,
       solicitud,
       limit ? parseInt(limit, 10) : 7,
@@ -86,9 +88,12 @@ export class LiquidacionesController {
 
   @Get('ajustes')
   @UseGuards(JwtAuthGuard)
-  async obtenerAjuste(@Req() req){
+  async obtenerAjuste(
+    @Req() req,
+    @Query('vista') vista?: string
+  ){
     const userId = req.user.usuario_id;
-    return this.liquidacionesService.obtenerAjuste(userId);
+    return this.liquidacionesService.obtenerAjuste(userId, vista);
   }
 
   // Dashboard

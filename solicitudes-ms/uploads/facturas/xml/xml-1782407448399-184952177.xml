@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante
+    xmlns:cfdi="http://www.sat.gob.mx/cfd/4"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital"
+    xsi:schemaLocation="
+        http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd
+        http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd"
+    Version="4.0"
+    Serie="SFFABP"
+    Folio="356192"
+    Fecha="2023-02-23T15:26:45"
+    Sello="YuvFwMQEwH3D+U2Oug3L+1/czgecpiHhPdbrhBdvcDm4Yn9TVT9OHK4P29juYHiut2MEJMgGA2TlneqBB2sZBPfGkwq/Y8mQm8pEzIVqdXUDPq1i9v/mbMi2v023FGO3hvH8E/333XPQW/Sy9ZaYXyJ1daOtMSE4/ZYh2pNoeHxLG7Imf9Yj5yC1qj6/nXyzKVDv+zoZjXwdrV72PEBql3lWmkXYsSdpJ9ZQBC/adKJDnqe+8ETaZpVlGOIXyZJPNdRUDQey9OJRMW/6w5OXN7BqMsjM3jXU5hZbIVwj2HF5fOOjQRX5WSa2w/CrHVhtvmevTeYyWQrSyFX3yrcQ=="
+    NoCertificado="00001000000501619816"
+    Certificado=""
+    SubTotal="241.38"
+    Descuento="24.14"
+    Moneda="MXN"
+    Total="252.00"
+    TipoDeComprobante="I"
+    Exportacion="01"
+    MetodoPago="PUE"
+    FormaPago="28"
+    LugarExpedicion="37270">
+
+    <cfdi:Emisor
+        Rfc="API6609273E0"
+        Nombre="AUTOBUSES DE LA PIEDAD"
+        RegimenFiscal="624"/>
+
+    <cfdi:Receptor
+        Rfc="PSA050722SN7"
+        Nombre="PRODUCTOS SELECTOS DE AGAVE"
+        DomicilioFiscalReceptor="45116"
+        RegimenFiscalReceptor="601"
+        UsoCFDI="G03"/>
+
+    <cfdi:Conceptos>
+        <cfdi:Concepto
+            ClaveProdServ="78111802"
+            NoIdentificacion="2408136923RSV70"
+            Cantidad="1"
+            ClaveUnidad="E54"
+            Unidad="Viaje"
+            Descripcion="SERVICIO DE TRANSPORTE DE PRIMERA PLUS GUAD-JIQI 20/02/2023 COMPLETO, Marco Antonio Marquez Rav. VTA REALIZADA EN GUANAJUATO"
+            ValorUnitario="241.38"
+            Importe="241.38"
+            Descuento="24.14"
+            ObjetoImp="02">
+
+            <cfdi:Impuestos>
+                <cfdi:Traslados>
+                    <cfdi:Traslado
+                        Base="217.24"
+                        Impuesto="002"
+                        TipoFactor="Tasa"
+                        TasaOCuota="0.160000"
+                        Importe="34.76"/>
+                </cfdi:Traslados>
+            </cfdi:Impuestos>
+
+        </cfdi:Concepto>
+    </cfdi:Conceptos>
+
+    <cfdi:Impuestos TotalImpuestosTrasladados="34.76">
+        <cfdi:Traslados>
+            <cfdi:Traslado
+                Base="217.24"
+                Impuesto="002"
+                TipoFactor="Tasa"
+                TasaOCuota="0.160000"
+                Importe="34.76"/>
+        </cfdi:Traslados>
+    </cfdi:Impuestos>
+
+    <cfdi:Complemento>
+        <tfd:TimbreFiscalDigital
+            Version="1.1"
+            UUID="d5de6278-3f2e-4686-9595-59ca2ba97503"
+            FechaTimbrado="2023-02-23T15:26:55"
+            RfcProvCertif="LSO1306189R5"
+            SelloCFD="YuvFwMQEwH3D+U2Oug3L+1/czgecpiHhPdbrhBdvcDm4Yn9TVT9OHK4P29juYHiut2MEJMgGA2TlneqBB2sZBPfGkwq/Y8mQm8pEzIVqdXUDPq1i9v/mbMi2v023FGO3hvH8E/333XPQW/Sy9ZaYXyJ1daOtMSE4/ZYh2pNoeHxLG7Imf9Yj5yC1qj6/nXyzKVDv+zoZjXwdrV72PEBql3lWmkXYsSdpJ9ZQBC/adKJDnqe+8ETaZpVlGOIXyZJPNdRUDQey9OJRMW/6w5OXN7BqMsjM3jXU5hZbIVwj2HF5fOOjQRX5WSa2w/CrHVhtvmevTeYyWQrSyFX3yrcQ=="
+            NoCertificadoSAT="00001000000509846663"
+            SelloSAT="VBw1ASFs3OCGdq0BzJWJqIgXYEv64463m9Uc7UXpC07vrefNiBgO+TcZ5hGC9V7V7fBBO2Ic97cASjekIfnf7UBX1jrwnIEoEILouYGKPvWVSboMJPmf6oce1KfdfKFV/8fafPraziptjzB2YaaysWP9sKPdOayL//J53lel8G8w63b3lkvZ2uiNmQCAPOAyf2m18ESNNcGYn1aSTDxmRGTWQulETLJzejls99hyG1obWRP6+QfZvo30HAH18PRMPXyP72yMLZ1KWtbJ/OvyqVIMW6gigqCHmX8QPZc+HRH5Ezp2T6uaUvpDnVq0cLglCDh7jeRRyELsgiYieg=="/>
+    </cfdi:Complemento>
+
+</cfdi:Comprobante>

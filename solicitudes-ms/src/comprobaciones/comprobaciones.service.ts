@@ -30,6 +30,7 @@ export class ComprobacionesService {
 
   async listarComprobaciones(
     userId: number,
+    vista?: string,
     estado?: string,
     folio?: string,
     fechaIni?: string,
@@ -59,6 +60,7 @@ export class ComprobacionesService {
     >`
       SELECT * FROM core.sp_listar_comps(
         ${userId}::INT,
+        ${vista || null}::VARCHAR,
         ${estado || null}::VARCHAR,
         ${folio || null}::VARCHAR,
         ${fechaIni || null}::DATE,
@@ -132,7 +134,11 @@ export class ComprobacionesService {
     return { comprobacion_id: row.comprobacion, nuevo_estado: row.nuevo_estado };
   }
 
-  async detalleComprobacion(userId: number, folio: string){
+  async detalleComprobacion(
+    userId: number, 
+    folio: string,
+    vista?: string,
+  ){
     const result = await this.prisma.$queryRaw<
       Array<{
         mensaje: string | null;
@@ -167,7 +173,8 @@ export class ComprobacionesService {
     >`
       SELECT * FROM core.sp_obtener_cmp(
         ${userId}::INT,
-        ${folio}::VARCHAR
+        ${folio}::VARCHAR,
+        ${vista || null}::VARCHAR
       )
     `;
 
@@ -243,7 +250,7 @@ export class ComprobacionesService {
   }
 
   // Dashboard
-  async getEstadosMensuales(userId: number){
+  async getEstadosMensuales(userId: number, vista?: string){
     const result = await this.prisma.$queryRaw<
       Array<{
         tipo: string | null;
@@ -256,7 +263,10 @@ export class ComprobacionesService {
         total: bigint | null;
       }>
     >`
-      SELECT * FROM core.sp_estados_mensuales( ${userId}::INT )
+      SELECT * FROM core.sp_estados_mensuales( 
+        ${userId}::INT,
+        ${vista || null}::VARCHAR 
+      )
       WHERE tipo = 'Comprobación'
     `;
 

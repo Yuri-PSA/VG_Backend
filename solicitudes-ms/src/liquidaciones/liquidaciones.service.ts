@@ -9,6 +9,7 @@ export class LiquidacionesService {
 
   async listarLiquid(
     userId: number,
+    vista?: string,
     estado?: string,
     solicitud?: string,
     limit: number = 7,
@@ -36,6 +37,7 @@ export class LiquidacionesService {
     >`
       SELECT * FROM core.sp_listar_liquidaciones(
         ${userId}::INT,
+        ${vista || null}::VARCHAR,
         ${estado || null}::VARCHAR,
         ${solicitud || null}::VARCHAR,
         ${limit}::INT,
@@ -145,15 +147,17 @@ export class LiquidacionesService {
     };
   }
 
-  async obtenerAjuste(userId: number){
+  async obtenerAjuste(userId: number, vista?: string){
     const result = await this.prisma.$queryRaw<
       Array<{
         mensaje: string | null;
         tipo_ajuste: string | null;
       }>
     >`
-      SELECT * FROM core.sp_obtener_ajuste( ${userId}::INT )
-    `;
+      SELECT * FROM core.sp_obtener_ajuste( 
+        ${userId}::INT,
+        ${vista || null}::VARCHAR
+      )`;
 
     if(result.length > 0 && result[0].mensaje)
       throw new HttpException(result[0].mensaje, HttpStatus.BAD_REQUEST);

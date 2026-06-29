@@ -33,6 +33,7 @@ export class SolicitudesService {
 
   async listarSolicitudes(
     userId: number,
+    vista?: string,
     estado?: string,
     folio?: string,
     fechaIni?: string,
@@ -43,6 +44,10 @@ export class SolicitudesService {
     orden: string = 'ASC',
     ordenMonto?: string,
     ordenFinanza?: string,
+    ordenColaborador?: string,
+    ordenPago?: string,
+    ordenFinanciero?: string,
+    ordenDestino?: string
   ){
     const result = await this.prisma.$queryRaw<
       Array<{
@@ -65,6 +70,7 @@ export class SolicitudesService {
     >`
       SELECT * FROM core.sp_listar_sols(
         ${userId}::INT,
+        ${vista || null}::VARCHAR,
         ${estado || null}::VARCHAR,
         ${folio || null}::VARCHAR,
         ${fechaIni || null}::DATE,
@@ -74,7 +80,11 @@ export class SolicitudesService {
         ${offset}::INT,
         ${orden}::VARCHAR,
         ${ordenMonto || null}::VARCHAR,
-        ${ordenFinanza || null}::VARCHAR
+        ${ordenFinanza || null}::VARCHAR,
+        ${ordenColaborador || null}::VARCHAR,
+        ${ordenPago || null}::VARCHAR,
+        ${ordenFinanciero || null}::VARCHAR,
+        ${ordenDestino || null}::VARCHAR
       )`;
 
     // Información de paginación y conteos
@@ -140,7 +150,11 @@ export class SolicitudesService {
     return { solicitud_id: row.solicitud, nuevo_estado: row.nuevo_estado };
   }
 
-  async detalleSolicitud(userId: number, folio: string){
+  async detalleSolicitud(
+    userId: number, 
+    folio: string,
+    vista?: string
+  ){
     const result = await this.prisma.$queryRaw<
       Array<{
         mensaje: string | null;
@@ -164,7 +178,8 @@ export class SolicitudesService {
     >`
       SELECT * FROM core.sp_obtener_sol(
         ${userId}::INT,
-        ${folio}::VARCHAR
+        ${folio}::VARCHAR,
+        ${vista || null}::VARCHAR
       )`;
 
     const row = result[0];
@@ -261,7 +276,12 @@ export class SolicitudesService {
 
   async getSolicitudesAprobadas(userId: number){
     const result = await this.prisma.$queryRaw<
-      Array<{ mensaje: string | null; folio_solicitud: string | null; monto_moneda: string | null }>
+      Array<{ 
+        mensaje: string | null; 
+        folio_solicitud: string | null; 
+        monto_moneda: string | null;
+        monto_solicitado: number | null;
+      }>
     >`
       SELECT * FROM core.sp_approved_requests(${userId}::INT)
     `;
@@ -274,6 +294,7 @@ export class SolicitudesService {
       .map(r => ({
         folio: r.folio_solicitud,
         moneda: r.monto_moneda,
+        monto: Number(r.monto_solicitado)
     }));
   }
 
@@ -359,7 +380,7 @@ export class SolicitudesService {
   }
 
   // Dashboard
-  async getEstadosMensuales(userId: number){
+  async getEstadosMensuales(userId: number, vista?: string){
     const result = await this.prisma.$queryRaw<
       Array<{
         tipo: string | null;
@@ -372,7 +393,10 @@ export class SolicitudesService {
         total: bigint | null;
       }>
     >`
-      SELECT * FROM core.sp_estados_mensuales( ${userId}::INT )
+      SELECT * FROM core.sp_estados_mensuales( 
+        ${userId}::INT,
+        ${vista || null}::VARCHAR 
+      )
       WHERE tipo = 'Solicitud'
     `;
 

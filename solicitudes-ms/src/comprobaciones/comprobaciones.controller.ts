@@ -51,6 +51,7 @@ export class ComprobacionesController {
   @UseGuards(JwtAuthGuard)
   async listar(
     @Req() req,
+    @Query('vista') vista?: string,
     @Query('estado') estado?: string,
     @Query('folio') folio?: string,
     @Query('fechaIni') fechaIni?: string,
@@ -67,6 +68,7 @@ export class ComprobacionesController {
 
     return this.comprobacionesService.listarComprobaciones(
       userId,
+      vista,
       estado,
       folio,
       fechaIni,
@@ -101,9 +103,10 @@ export class ComprobacionesController {
   async obtenerDetalle(
     @Req() req,
     @Query('folio') folio: string,
+    @Query('vista') vista?: string,
   ){
     const userId = req.user.usuario_id;
-    return this.comprobacionesService.detalleComprobacion(userId, folio);
+    return this.comprobacionesService.detalleComprobacion(userId, folio, vista);
   }
 
   @Patch('editar')
@@ -119,9 +122,12 @@ export class ComprobacionesController {
   // Dashboard
   @Get('dashboard/estados')
   @UseGuards(JwtAuthGuard)
-  async getEstadosMensuales(@Req() req){
+  async getEstadosMensuales(
+    @Req() req,
+    @Query('vista') vista?: string
+  ){
     const userId = req.user.usuario_id;
-    return this.comprobacionesService.getEstadosMensuales(userId);
+    return this.comprobacionesService.getEstadosMensuales(userId, vista);
   }
 
   // colaboradores

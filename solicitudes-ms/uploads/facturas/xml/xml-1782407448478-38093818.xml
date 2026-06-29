@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante 
+    xmlns:cfdi="http://www.sat.gob.mx/cfd/4"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital"
+    xsi:schemaLocation="
+        http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd
+        http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd"
+    Version="4.0"
+    Serie="GDLANA"
+    Folio="56254"
+    Fecha="2023-02-24T07:39:21"
+    Sello="XGaLKg1unNL2hqctWhOurnMP1J7jY+SHKrENnr4etXW6aEMKHk/RJ07Aeh7EscxGCN4gbQaZgPWkHh6vTRYkjQdOLri7KMLLaJl6YhYuQPhwdYJCOIpxe++/pJS81YTyGTjDrD4mULvst4C+zZ8NddpzMya+Q2egIThyJaqkwC8zkha/TJfbm3dVll7MPpGRtti01AZSfwW3aiGGYcL23CZXJNq2zP5D4zhlmc8CnmBKUuhv+V7f2+RD3MJOv0CuK6+2bIBCL7KvdRzVAHkAwkY3zFfLjoKEEAW69BDjZ+CtBJJrCGoqyWBes/vbW+UonXpLexsTOhNwWDzoRFkh0g=="
+    NoCertificado="00001000000507006117"
+    Certificado=""
+    SubTotal="3960.00"
+    Moneda="MXN"
+    Total="4712.40"
+    TipoDeComprobante="I"
+    Exportacion="01"
+    MetodoPago="PUE"
+    FormaPago="28"
+    LugarExpedicion="45116">
+
+    <cfdi:Emisor 
+        Rfc="DBM121023M10"
+        Nombre="FIDEICOMISO IRREVOCABLE DB/1616"
+        RegimenFiscal="601"/>
+
+    <cfdi:Receptor
+        Rfc="PSA050722SN7"
+        Nombre="PRODUCTOS SELECTOS DE AGAVE"
+        DomicilioFiscalReceptor="45116"
+        RegimenFiscalReceptor="601"
+        UsoCFDI="G03"/>
+
+    <cfdi:Conceptos>
+        <cfdi:Concepto
+            ClaveProdServ="90111800"
+            NoIdentificacion="OPE-GDLANA15803524.02.20237:38:34"
+            Cantidad="1"
+            ClaveUnidad="E48"
+            Unidad="Unidad de servicio"
+            Descripcion="Hospedaje"
+            ValorUnitario="3960.00"
+            Importe="3960.00"
+            ObjetoImp="02">
+
+            <cfdi:Impuestos>
+                <cfdi:Traslados>
+                    <cfdi:Traslado
+                        Base="3960.00"
+                        Impuesto="002"
+                        TipoFactor="Tasa"
+                        TasaOCuota="0.160000"
+                        Importe="633.60"/>
+                </cfdi:Traslados>
+            </cfdi:Impuestos>
+
+        </cfdi:Concepto>
+    </cfdi:Conceptos>
+
+    <cfdi:Impuestos TotalImpuestosTrasladados="633.60">
+        <cfdi:Traslados>
+            <cfdi:Traslado
+                Base="3960.00"
+                Impuesto="002"
+                TipoFactor="Tasa"
+                TasaOCuota="0.160000"
+                Importe="633.60"/>
+        </cfdi:Traslados>
+    </cfdi:Impuestos>
+
+    <cfdi:Complemento>
+        <tfd:TimbreFiscalDigital
+            Version="1.1"
+            UUID="223F73EA-2D12-4224-948B-5C95309DF847"
+            FechaTimbrado="2023-02-24T07:39:23"
+            RfcProvCertif="EFA100217SU5"
+            SelloCFD="XGaLKg1unNL2hqctWhOurnMP1J7jY+SHKrENnr4etXW6aEMKHk/RJ07Aeh7EscxGCN4gbQaZgPWkHh6vTRYkjQdOLri7KMLLaJl6YhYuQPhwdYJCOIpxe++/pJS81YTyGTjDrD4mULvst4C+zZ8NddpzMya+Q2egIThyJaqkwC8zkha/TJfbm3dVll7MPpGRtti01AZSfwW3aiGGYcL23CZXJNq2zP5D4zhlmc8CnmBKUuhv+V7f2+RD3MJOv0CuK6+2bIBCL7KvdRzVAHkAwkY3zFfLjoKEEAW69BDjZ+CtBJJrCGoqyWBes/vbW+UonXpLexsTOhNwWDzoRFkh0g=="
+            NoCertificadoSAT="00001000000504041684"
+            SelloSAT="l2vcq7LDIzcoay8rESJnNGhWNgjnEVMWdzx9/ZGRkmMYTjveLzzVyeY0vGDFw3bT1rT0t3/DnQTElOvJpZHNgtAAQ0MM02o/REQQzyEZXv/QrhtWRzF619XnKUT7Smj2ETsA4XypdEKEzc5uIhT5+AzhQaaDVOAI92I50EDH0YnZnUGP0LjdWVNYCkq3ysQyCG4f0dov8rX/HgVD+OPFL5ZKuKId80igZd9DTCEz0E6CSouwbx9xDBRFvqJTuSTeaSqAoKRcKjwH2hfXZ8e0hVcX5Y8QjiAIfWDTZRXUhYi8mi5x4anmM39nV9x2DIx33GDzGnGiG0wEQDzfoKbVBg=="/>
+    </cfdi:Complemento>
+
+</cfdi:Comprobante>

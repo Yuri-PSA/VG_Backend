@@ -33,11 +33,17 @@ export class AuthService {
                 nombre: string;
                 apellidos: string;
                 activo: boolean;
+                acceso: boolean;
+                es_jefe: boolean;
             }>
         >(
-            `SELECT usuario_id, correo, rol, nombre, apellidos, activo
-            FROM auth.usuario
-            WHERE correo = $1`,
+            `SELECT u.usuario_id, u.correo, u.rol, u.nombre, u.apellidos, u.activo, u.acceso,
+                EXISTS(
+                    SELECT 1 FROM auth.usuario c
+                    WHERE c.jefe_directo =_id = u.usuario_id AND c.activo = TRUE
+                ) AS es_jefe
+            FROM auth.usuario u
+            WHERE u.correo = $1`,
             correo,
         );
 
@@ -49,6 +55,9 @@ export class AuthService {
         if(!usuario.activo)
             throw new UnauthorizedException('Tu cuenta ha sido desactivada. Por favor, contacta al administrador');
 
+        if(!usuario.acceso)
+            throw new UnauthorizedException('No tienes acceso al sistema. Por favor, contacta al administrador');
+
         const firstName = usuario.nombre.split(' ')[0];
         const lastName  = usuario.apellidos.split(' ')[0];
         const shortName = `${firstName} ${lastName}`;
@@ -58,6 +67,7 @@ export class AuthService {
             correo: usuario.correo,
             rol: usuario.rol,
             nombre: shortName,
+            es_jefe: usuario.es_jefe,
         };
 
         return {
@@ -67,6 +77,7 @@ export class AuthService {
                 correo: usuario.correo,
                 rol: usuario.rol,
                 nombre: shortName,
+                es_jefe: usuario.es_jefe,
             },
         };
     }
@@ -82,11 +93,17 @@ export class AuthService {
                 nombre: string;
                 apellidos: string; 
                 activo: boolean;
+                acceso: boolean;
+                es_jefe: boolean;
             }>
         >(
-            `SELECT usuario_id, correo, rol, password, nombre, apellidos, activo
-            FROM auth.usuario
-            WHERE correo = $1`,
+            `SELECT u.usuario_id, u.correo, u.rol, u.password, u.nombre, u.apellidos, u.activo, u.acceso,
+                EXISTS (
+                    SELECT 1 FROM auth.usuario c
+                    WHERE c.jefe_directo_id = u.usuario_id AND c.activo = TRUE
+                ) AS es_jefe
+            FROM auth.usuario u
+            WHERE u.correo = $1`,
             correo,
         );
 
@@ -97,6 +114,9 @@ export class AuthService {
 
         if(!usuario.activo)
             throw new UnauthorizedException('Tu cuenta ha sido desactivada. Por favor, contacta al administrador');
+
+        if(!usuario.acceso)
+            throw new UnauthorizedException('No tienes acceso al sistema. Por favor, contacta al administrador');
 
         const result = await this.prisma.$queryRawUnsafe<Array<{ match: boolean }>>(
             `SELECT (password = crypt($1, password)) AS match
@@ -111,7 +131,7 @@ export class AuthService {
         const shortName = `${firstName} ${lastName}`;
 
         if(result[0]?.match) {
-            const { password, activo, ...rest } = usuario;
+            const { password, activo, acceso, ...rest } = usuario;
             return { ...rest, nombre: shortName }; // return data without password
         }
         throw new UnauthorizedException('Credenciales incorrectas. Por favor, verifica tu correo y contraseña');
@@ -124,6 +144,7 @@ export class AuthService {
             correo: user.correo,
             rol: user.rol,
             nombre: user.nombre,
+            es_jefe: user.es_jefe,
         };
         return {
             access_token: this.jwtService.sign(payload),
@@ -132,6 +153,7 @@ export class AuthService {
                 correo: user.correo,
                 rol: user.rol,
                 nombre: user.nombre,
+                es_jefe: user.es_jefe,
             },
         };
     }

@@ -18,6 +18,7 @@ model Usuario {
   rol                   Rol
   departamento          String
   activo                Boolean             @default(true)
+  acceso                Boolean             @default(true)
   fecha_creacion        DateTime            @default(now())
 
   jefe_directo          Usuario?            @relation("JefeDirecto", fields: [jefe_directo_id], references: [usuario_id])
