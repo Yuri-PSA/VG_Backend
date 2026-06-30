@@ -136,6 +136,7 @@ export class AzureSyncService implements OnModuleInit {
                         LIMIT 1
                     )
                     WHERE u.correo = ${correo}
+                        AND u.jefe_directo_id IS NULL
                 `;
             }
 

@@ -1,4 +1,5 @@
-import { Controller, Post, Body, Res, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Body, Res, Req, Query, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from './jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { AzureSyncService } from './azure-sync.service';
 import express from 'express';
@@ -36,6 +37,67 @@ export class AuthController {
         return { access_token, usuario };
     }
 
+    @Get('listar')
+    @UseGuards(JwtAuthGuard)
+    async listarUsuarios(
+        @Req() req,
+        @Query('ident') ident?: string,
+        @Query('colaborador') colaborador?: string,
+        @Query('departamento') departamento?: string,
+        @Query('ordenNombre') ordenNombre?: string,
+        @Query('ordenEmail') ordenEmail?: string,
+        @Query('ordenDep') ordenDep?: string,
+        @Query('ordenAcceso') ordenAcceso?: string,
+        @Query('ordenRol') ordenRol?: string,
+        @Query('pagina') pagina?: string,
+        @Query('limit') limit?: string,
+        @Query('offset') offset?: string,
+    ) {
+        const userId = req.user.usuario_id;
+        return this.authService.listarUsuarios(
+            userId,
+            ident,
+            colaborador,
+            departamento,
+            ordenNombre,
+            ordenEmail,
+            ordenDep,
+            ordenAcceso,
+            ordenRol,
+            pagina,
+            limit ? parseInt(limit, 10) : 7,
+            offset ? parseInt(offset, 10) : 0,
+        );
+    }
+
+    @Patch('actualizar-acceso')
+    @UseGuards(JwtAuthGuard)
+    async actualizarAcceso(
+        @Req() req,
+        @Body() body: { usuarioId: number; acceso: boolean },
+    ){
+        const userId = req.user.usuario_id;
+        return this.authService.actualizarAcceso(userId, body.usuarioId, body.acceso);
+    }
+
+    @Patch('actualizar-rol')
+    @UseGuards(JwtAuthGuard)
+    async actualizarRol(
+        @Req() req,
+        @Body() body: { usuarioId: number; rol: string },
+    ){
+        const userId = req.user.usuario_id;
+        return this.authService.actualizarRol(userId, body.usuarioId, body.rol);
+    }
+
+    @Post('logout')
+    logout(@Res({ passthrough: true }) res: express.Response) {
+        res.clearCookie('jwt', { path: '/' });
+        return { message: 'Sesión cerrada' };
+    }
+
+
+
     // Borrar después (se usa para local)
     @Post('login')
     async login(
@@ -56,10 +118,4 @@ export class AuthController {
         return { access_token, usuario };
     }
     // Hasta aquí
-
-    @Post('logout')
-    logout(@Res({ passthrough: true }) res: express.Response) {
-        res.clearCookie('jwt', { path: '/' });
-        return { message: 'Sesión cerrada' };
-    }
 }

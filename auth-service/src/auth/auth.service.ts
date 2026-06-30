@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -40,7 +40,7 @@ export class AuthService {
             `SELECT u.usuario_id, u.correo, u.rol, u.nombre, u.apellidos, u.activo, u.acceso,
                 EXISTS(
                     SELECT 1 FROM auth.usuario c
-                    WHERE c.jefe_directo =_id = u.usuario_id AND c.activo = TRUE
+                    WHERE c.jefe_directo_id = u.usuario_id AND c.activo = TRUE
                 ) AS es_jefe
             FROM auth.usuario u
             WHERE u.correo = $1`,
@@ -81,6 +81,124 @@ export class AuthService {
             },
         };
     }
+
+    async listarUsuarios(
+        userId: number,
+        ident?: string,
+        colaborador?: string,
+        departamento?: string,
+        ordenNombre?: string,
+        ordenEmail?: string,
+        ordenDep?: string,
+        ordenAcceso?: string,
+        ordenRol?: string,
+        pagina: string = 'Accesos',
+        limit: number = 7,
+        offset: number = 0
+    ){
+        const result = await this.prisma.$queryRaw<
+            Array<{
+                mensaje: string | null;
+                usuario_id: number | null;
+                nombre_completo: string | null;
+                correo: string | null;
+                departamento: string | null;
+                rol: string | null;
+                jefe: string | null;
+                acceso: boolean | null;
+                paginas: bigint | null;
+            }>
+        >`
+            SELECT * FROM auth.sp_listar_usuarios(
+                ${userId}::INT,
+                ${ident || null}::VARCHAR,
+                ${colaborador || null}::VARCHAR,
+                ${departamento || null}::VARCHAR,
+                ${ordenNombre || null}::VARCHAR,
+                ${ordenEmail || null}::VARCHAR,
+                ${ordenDep || null}::VARCHAR,
+                ${ordenAcceso || null}::VARCHAR,
+                ${ordenRol || null}::VARCHAR,
+                ${pagina}::VARCHAR,
+                ${limit}::INT,
+                ${offset}::INT
+            )`;
+        
+        if(result.length > 0 && result[0].mensaje)
+            throw new HttpException(result[0].mensaje, HttpStatus.BAD_REQUEST);
+
+        if(result.length === 0 || result[0].paginas === null) {
+            return {
+                usuarios: [],
+                paginacion: { totalPaginas: 0, paginaActual: 1 },
+                mensaje: 'No se encontraron usuarios',
+            };
+        }
+
+        return {
+            usuarios: result.map(u => ({
+                usuario_id: u.usuario_id,
+                nombre_completo: u.nombre_completo,
+                correo: u.correo,
+                departamento: u.departamento,
+                rol: u.rol,
+                jefe: u.jefe,
+                acceso: u.acceso,
+            })),
+            paginacion: {
+                totalPaginas: Number(result[0].paginas),
+                paginaActual: Math.floor(offset / limit) + 1,
+            },
+        };
+    }
+
+    async actualizarAcceso(
+        userId: number,
+        targetId: number,
+        acceso: boolean
+    ){
+        const result = await this.prisma.$queryRaw<
+            Array<{
+                mensaje: string | null;
+                exito: boolean;
+            }>
+        >`
+            SELECT * FROM auth.sp_actualizar_acceso(
+                ${userId}::INT,
+                ${targetId}::INT,
+                ${acceso}::BOOLEAN
+            )`;
+
+        if(result.length > 0 && result[0].mensaje)
+            throw new HttpException(result[0].mensaje, HttpStatus.BAD_REQUEST);
+
+        return { message: `Acceso ${acceso ? 'activado' : 'desactivado'} correctamente` };
+    }
+
+    async actualizarRol(
+        userId: number,
+        targetId: number,
+        rol: string
+    ){
+        const result = await this.prisma.$queryRaw<
+            Array<{
+                mensaje: string | null;
+                exito: boolean;
+            }>
+        >`
+            SELECT * FROM auth.sp_actualizar_rol(
+                ${userId}::INT,
+                ${targetId}::INT,
+                ${rol}::VARCHAR
+            )`;
+        
+        if(result.length > 0 && result[0].mensaje)
+            throw new HttpException(result[0].mensaje, HttpStatus.BAD_REQUEST);
+
+        return { message: `Rol actualizado a ${rol} correctamente` };
+    }
+
+
 
     // Borrar después (se usa para local)
     async validateUser(correo: string, plainPassword: string): Promise<any> {
