@@ -92,6 +92,7 @@ export class AuthService {
         ordenDep?: string,
         ordenAcceso?: string,
         ordenRol?: string,
+        ordenJefe?: string,
         pagina: string = 'Accesos',
         limit: number = 7,
         offset: number = 0
@@ -119,6 +120,7 @@ export class AuthService {
                 ${ordenDep || null}::VARCHAR,
                 ${ordenAcceso || null}::VARCHAR,
                 ${ordenRol || null}::VARCHAR,
+                ${ordenJefe || null}::VARCHAR,
                 ${pagina}::VARCHAR,
                 ${limit}::INT,
                 ${offset}::INT
