@@ -92,11 +92,32 @@ export class AuthController {
         return this.authService.actualizarRol(userId, body.usuarioId, body.rol);
     }
 
+    @Get('jefes-disponibles')
+    @UseGuards(JwtAuthGuard)
+    async listarJefesDisponibles(
+        @Req() req,
+        @Query('targetId') targetId: string,
+    ){
+        const userId = req.user.usuario_id;
+        return this.authService.listaJefe(userId, parseInt(targetId, 10));
+    }
+
+    @Patch('actualizar-jefe')
+    @UseGuards(JwtAuthGuard)
+    async actualizarJefe(
+        @Req() req,
+        @Body() body: { usuarioId: number; jefeId: number | null },
+    ){
+        const userId = req.user.usuario_id;
+        return this.authService.actualizarJefe(userId, body.usuarioId, body.jefeId);
+    }
+
     @Post('logout')
     logout(@Res({ passthrough: true }) res: express.Response) {
         res.clearCookie('jwt', { path: '/' });
         return { message: 'Sesión cerrada' };
     }
+
 
 
 

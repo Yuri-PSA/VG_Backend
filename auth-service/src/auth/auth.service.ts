@@ -200,6 +200,51 @@ export class AuthService {
         return { message: `Rol actualizado a ${rol} correctamente` };
     }
 
+    async listaJefe(
+        userId: number,
+        targetId: number
+    ){
+        const result = await this.prisma.$queryRaw<
+            Array<{
+                mensaje: string | null;
+                usuario_id: number | null;
+                nombre: string | null;
+            }>
+        >`
+            SELECT * FROM auth.sp_listar_jefes(
+                ${userId}::INT,
+                ${targetId}::INT
+            )`;
+        
+        if(result.length > 0 && result[0].mensaje)
+            throw new HttpException(result[0].mensaje, HttpStatus.BAD_REQUEST);
+
+        return result.map(r => ({ usuario_id: r.usuario_id, nombre: r.nombre }));
+    }
+
+    async actualizarJefe(
+        userId: number, 
+        targetId: number, 
+        jefeId: number | null
+    ){
+        const result = await this.prisma.$queryRaw<
+            Array<{
+                mensaje: string | null;
+                exito: boolean;
+            }>
+        >`
+            SELECT * FROM auth.sp_actualizar_jefe(
+                ${userId}::INT,
+                ${targetId}::INT,
+                ${jefeId}::INT
+            )`;
+
+        if(result.length > 0 && result[0].mensaje)
+            throw new HttpException(result[0].mensaje, HttpStatus.BAD_REQUEST);
+
+        return { message: 'Jefe directo actualizado correctamente' };
+    }
+
 
 
     // Borrar después (se usa para local)
